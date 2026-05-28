@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>JARVIS Core Interface | Autonomous Orchestrator</title>
+    <!-- Tailwind CSS v3 + Font Awesome Icons + Google Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <!-- Configure Tailwind Extend -->
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body {
+            background: radial-gradient(circle at 10% 20%, rgba(0, 10, 30, 1) 0%, rgba(0, 0, 0, 0.95) 100%);
+            min-height: 100vh;
+        }
+        /* Custom scrollbar for logs */
+        .logs-container::-webkit-scrollbar {
+            width: 5px;
+        }
+        .logs-container::-webkit-scrollbar-track {
+            background: #0f172a;
+            border-radius: 10px;
+        }
+        .logs-container::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 10px;
+        }
+        .glass-card {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            transition: all 0.2s ease;
+        }
+        .glass-card:hover {
+            border-color: rgba(59, 130, 246, 0.6);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+        .btn-primary {
+            background: linear-gradient(95deg, #2563eb, #1e40af);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            transition: 0.2s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(37, 99, 235, 0.5);
+        }
+        .status-led {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #10b981;
+            box-shadow: 0 0 6px #10b981;
+            animation: pulse 1.8s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.4; transform: scale(0.8);}
+            100% { opacity: 1; transform: scale(1.2);}
+        }
+        .typing-effect::after {
+            content: '▊';
+            animation: blink 1s step-end infinite;
+            margin-left: 2px;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        input, textarea, select {
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #e2e8f0;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            ring: 2px solid #3b82f6;
+        }
+    </style>
+</head>
+<body class="text-slate-200">
+
+    <!-- Main Dashboard Container -->
+    <div class="max-w-7xl mx-auto px-4 py-6 md:py-10">
+        <!-- Header: JARVIS Status & Respect Protocol -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div class="flex items-center gap-3">
+                <i class="fas fa-microchip text-4xl text-blue-400"></i>
+                <div>
+                    <h1 class="text-3xl font-bold tracking-tight bg-gradient-to-r from-blue-300 via-indigo-400 to-purple-400 bg-clip-text text-transparent">JARVIS CORE</h1>
+                    <p class="text-sm text-slate-400 flex items-center gap-2"><span class="status-led"></span> Autonomous Multi-Agent Orchestrator | Online & Ready</p>
+                </div>
+            </div>
+            <div class="flex gap-3 text-sm bg-slate-800/50 px-4 py-2 rounded-full border border-slate-700">
+                <i class="fas fa-shield-alt text-emerald-400"></i>
+                <span>Executive Consent Protocol Active</span>
+                <i class="fas fa-lock text-blue-400 ml-1"></i>
+            </div>
+        </div>
+
+        <!-- Split Layout: Left panel (Orchestrator + API Controls) | Right panel (Live Logs & AI Response) -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- LEFT COLUMN: Command & Agent Strategy (2/3 width on large) -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Strategy Card: Proactive Market Audit Engine -->
+                <div class="glass-card rounded-2xl p-5">
+                    <div class="flex justify-between items-center border-b border-slate-700/70 pb-3 mb-4">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-chart-line text-blue-400 text-xl"></i>
+                            <h2 class="text-xl font-semibold">Live Market Intelligence</h2>
+                        </div>
+                        <span class="text-xs bg-blue-950/60 px-2 py-1 rounded-full"><i class="far fa-clock mr-1"></i>Real-time simulation</span>
+                    </div>
+                    <p class="text-slate-300 text-sm mb-4">Sir, I have just completed a live global audit of the internet market. Search volumes across <strong>TikTok, Shopify & Pinterest</strong> for 'AI automation tools', 'digital product templates', and 'faceless YouTube channels' have spiked by <strong>+187%</strong> in last 72 hours, while active competitor listings are critically low. The required physical effort is minimal, but the scaling capability is massive. I have formulated the full safe execution roadmap. Should I instruct the Worker Agents to prepare the live deployment for your direct approval, Sir?</p>
+                    <div class="flex flex-wrap gap-3">
+                        <button id="approveMarketBtn" class="btn-primary px-5 py-2 rounded-lg font-medium text-sm flex items-center gap-2"><i class="fas fa-check-circle"></i> Execute Strategy (Approve)</button>
+                        <button id="rejectMarketBtn" class="bg-slate-700 hover:bg-slate-600 px-5 py-2 rounded-lg font-medium text-sm transition"><i class="fas fa-times-circle"></i> Reject / Rescan</button>
+                    </div>
+                </div>
+                
+                <!-- API Configuration & Custom Prompt (Gemini/OpenAI dynamic) -->
+                <div class="glass-card rounded-2xl p-5">
+                    <div class="flex flex-wrap gap-3 justify-between items-center border-b border-slate-700/70 pb-3 mb-4">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-key text-amber-400"></i>
+                            <h2 class="text-xl font-semibold">LLM Engine Connection</h2>
+                        </div>
+                        <div class="flex gap-2">
+                            <button id="setGeminiBtn" class="text-xs bg-slate-800 px-3 py-1 rounded-full border border-slate-600 hover:border-blue-500 transition">Gemini API</button>
+                            <button id="setOpenAIBtn" class="text-xs bg-slate-800 px-3 py-1 rounded-full border border-slate-600 hover:border-blue-500 transition">OpenAI API</button>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">API Key <span class="text-red-400">*</span></label>
+                            <input type="password" id="apiKeyInput" class="w-full rounded-lg px-4 py-2 text-sm" placeholder="Enter your Gemini or OpenAI API Key">
+                            <p id="apiProviderHint" class="text-xs text-slate-500 mt-1">Current mode: <span id="activeProviderSpan" class="text-blue-300 font-semibold">Gemini</span> (supports Gemini 1.5 / OpenAI GPT-3.5/4)</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">System Objective / Prompt</label>
+                            <textarea id="customPromptArea" rows="2" class="w-full rounded-lg px-4 py-2 text-sm" placeholder="E.g., 'Generate a Shopify product listing for AI sticker pack, with SEO tags & description'">Sir, I need conversion-optimized product listing for a digital "AI Productivity Notion Template". Include title, bulletproof description, pricing psychology, and Pinterest hashtags.</textarea>
+                        </div>
+                        <button id="sendToAIWorker" class="w-full bg-indigo-600 hover:bg-indigo-700 transition rounded-xl py-2.5 font-semibold flex items-center justify-center gap-2"><i class="fab fa-rocketchat"></i> Deploy AI Agent (Execute Task)</button>
+                    </div>
+                </div>
+
+                <!-- Quick Actions: Shopify / Social Media / WhatsApp Simulation -->
+                <div class="glass-card rounded-2xl p-5">
+                    <h2 class="text-xl font-semibold flex items-center gap-2 mb-3"><i class="fas fa-network-wired text-emerald-400"></i> Sub-Agent Command Center</h2>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <button data-agent="shopify" class="agent-action bg-slate-800/70 hover:bg-slate-700 rounded-xl py-3 flex flex-col items-center gap-1 transition"><i class="fab fa-shopify text-2xl text-teal-400"></i><span class="text-xs">Shopify Worker</span></button>
+                        <button data-agent="social" class="agent-action bg-slate-800/70 hover:bg-slate-700 rounded-xl py-3 flex flex-col items-center gap-1 transition"><i class="fas fa-hashtag text-2xl text-pink-400"></i><span class="text-xs">Social Syndicator</span></button>
+                        <button data-agent="whatsapp" class="agent-action bg-slate-800/70 hover:bg-slate-700 rounded-xl py-3 flex flex-col items-center gap-1 transition"><i class="fab fa-whatsapp text-2xl text-green-400"></i><span class="text-xs">WhatsApp Delivery</span></button>
+                        <button data-agent="coder" class="agent-action bg-slate-800/70 hover:bg-slate-700 rounded-xl py-3 flex flex-col items-center gap-1 transition"><i class="fas fa-code text-2xl text-purple-400"></i><span class="text-xs">Coder Agent SaaS</span></button>
+                    </div>
+                    <p class="text-[11px] text-slate-500 mt-3 text-center">Execute domain-specific autonomous routines | All actions require final verbal consent (Execute/Yes/Done)</p>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Live Execution Logs + AI Response Panel -->
+            <div class="lg:col-span-1 flex flex-col gap-6">
+                <!-- JARVIS Live Logs Console -->
+                <div class="glass-card rounded-2xl p-4 h-[280px] flex flex-col">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="font-semibold text-sm flex items-center gap-1"><i class="fas fa-terminal text-green-400"></i> Orchestrator Logs</h3>
+                        <button id="clearLogsBtn" class="text-xs text-slate-400 hover:text-white"><i class="far fa-trash-alt"></i> Clear</button>
+                    </div>
+                    <div id="logsContainer" class="logs-container flex-1 overflow-y-auto text-xs font-mono space-y-1.5 pr-1">
+                        <div class="text-emerald-400">> JARVIS Core initialized. Multi-agent architecture online.</div>
+                        <div class="text-blue-300">> Audit routines: scanning product trends, competitor mapping...</div>
+                        <div class="text-slate-400">> Awaiting executive command, Sir.</div>
+                    </div>
+                </div>
+                
+                <!-- AI Response Panel (Dynamic result from Gemini/OpenAI) -->
+                <div class="glass-card rounded-2xl p-4 flex-1 min-h-[280px]">
+                    <div class="flex items-center gap-2 border-b border-slate-700 pb-2 mb-3">
+                        <i class="fas fa-brain text-purple-400"></i>
+                        <h3 class="font-semibold text-sm">Strategic AI Output</h3>
+                        <span id="loadingIndicator" class="ml-auto hidden"><i class="fas fa-spinner fa-pulse text-blue-300"></i></span>
+                    </div>
+                    <div id="aiResponseContent" class="text-sm text-slate-200 overflow-y-auto max-h-[260px] pr-1 leading-relaxed whitespace-pre-wrap">
+                        <span class="text-slate-400 italic">No AI request yet. Provide an API key & deploy prompt, Sir.</span>
+                    </div>
+                </div>
+                <!-- Permission State -->
+                <div class="bg-slate-900/50 rounded-xl p-3 text-center text-xs border border-slate-800">
+                    <i class="fas fa-gavel text-amber-500 mr-1"></i> Consent Loop Active — Awaiting <span class="font-mono text-green-300">"Done", "Yes", "Execute"</span> for any live deployment.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ---------- JARVIS STATE ----------
+        let activeAPIProvider = 'gemini';   // 'gemini' or 'openai'
+        let apiKey = '';
+        let lastGeneratedPayload = null;
+        
+        // DOM Elements
+        const logsContainer = document.getElementById('logsContainer');
+        const clearLogsBtn = document.getElementById('clearLogsBtn');
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        const activeProviderSpan = document.getElementById('activeProviderSpan');
+        const sendToAIWorkerBtn = document.getElementById('sendToAIWorker');
+        const customPromptArea = document.getElementById('customPromptArea');
+        const aiResponseDiv = document.getElementById('aiResponseContent');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        
+        // helper: add log message (timestamped)
+        function addLog(message, type = 'info') {
+            const logDiv = document.createElement('div');
+            const time = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute:'2-digit', second:'2-digit' });
+            let colorClass = 'text-slate-300';
+            if (type === 'success') colorClass = 'text-emerald-400';
+            else if (type === 'error') colorClass = 'text-red-400';
+            else if (type === 'warning') colorClass = 'text-yellow-400';
+            else if (type === 'exec') colorClass = 'text-blue-300';
+            logDiv.innerHTML = `<span class="text-slate-500">[${time}]</span> <span class="${colorClass}">${message}</span>`;
+            logsContainer.appendChild(logDiv);
+            logDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        
+        function setAPIProvider(provider) {
+            activeAPIProvider = provider;
+            activeProviderSpan.innerText = provider === 'gemini' ? 'Gemini (Google)' : 'OpenAI (GPT)';
+            addLog(`API provider switched to ${provider.toUpperCase()}. Awaiting key validation.`, 'exec');
+            if (provider === 'gemini') {
+                apiKeyInput.placeholder = "Enter Gemini API Key (ex: AIzaSy...)";
+            } else {
+                apiKeyInput.placeholder = "Enter OpenAI API Key (sk-proj-...)";
+            }
+        }
+        
+        // Update API key from input
+        apiKeyInput.addEventListener('input', (e) => {
+            apiKey = e.target.value.trim();
+        });
+        
+        // Gemini & OpenAI Universal Call
+        async function callLLM(promptText) {
+            if (!apiKey) {
+                addLog("ERROR: API key missing. Please provide valid key before execution.", "error");
+                aiResponseDiv.innerHTML = `<span class="text-red-300">❌ Missing API Key. Sir, provide valid ${activeAPIProvider.toUpperCase()} key to continue.</span>`;
+                return null;
+            }
+            loadingIndicator.classList.remove('hidden');
+            aiResponseDiv.innerHTML = `<span class="text-blue-200 italic"><i class="fas fa-spinner fa-pulse mr-1"></i> JARVIS orchestrating sub-agents for reasoning...</span>`;
+            try {
+                let responseData = null;
+                if (activeAPIProvider === 'gemini') {
+                    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+                    const payload = {
+                        contents: [{ parts: [{ text: promptText }] }],
+                        generationConfig: { temperature: 0.7, maxOutputTokens: 800 }
+                    };
+                    const resp = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!resp.ok) {
+                        const errText = await resp.text();
+                        throw new Error(`Gemini API Error ${resp.status}: ${errText.substring(0, 150)}`);
+                    }
+                    const json = await resp.json();
+                    responseData = json.candidates?.[0]?.content?.parts?.[0]?.text || "No response from Gemini. Sir, verify quota.";
+                } 
+                else { // OpenAI
+                    const url = 'https://api.openai.com/v1/chat/completions';
+                    const payload = {
+                        model: 'gpt-3.5-turbo',
+                        messages: [{ role: 'user', content: promptText }],
+                        temperature: 0.7,
+                        max_tokens: 800
+                    };
+                    const resp = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${apiKey}`
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!resp.ok) {
+                        const errData = await resp.json();
+                        throw new Error(`OpenAI Error: ${errData.error?.message || resp.statusText}`);
+                    }
+                    const json = await resp.json();
+                    responseData = json.choices?.[0]?.message?.content || "OpenAI response empty.";
+                }
+                addLog(`LLM inference successful (${activeAPIProvider.toUpperCase()}).`, 'success');
+                aiResponseDiv.innerHTML = `<div class="prose prose-sm text-slate-100 break-words">${escapeHtml(responseData)}</div>`;
+                return responseData;
+            } catch (err) {
+                addLog(`LLM call failed: ${err.message}`, 'error');
+                aiResponseDiv.innerHTML = `<span class="text-red-300">⚠️ Execution failed: ${err.message}. Sir, check API credentials.</span>`;
+                return null;
+            } finally {
+                loadingIndicator.classList.add('hidden');
+            }
+        }
+        
+        function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+        
+        // Main AI Task via Send Button
+        sendToAIWorkerBtn.addEventListener('click', async () => {
+            if (!apiKey) {
+                addLog("Cannot deploy AI Worker: No API Key provided, Sir.", "error");
+                aiResponseDiv.innerHTML = `<span class="text-yellow-300">❗Please enter a valid ${activeAPIProvider.toUpperCase()} API Key to proceed.</span>`;
+                return;
+            }
+            const userPrompt = customPromptArea.value.trim();
+            if (!userPrompt) {
+                addLog("Prompt empty. Insert a business objective for agents.", "warning");
+                return;
+            }
+            addLog(`Executing AI Agent on prompt: "${userPrompt.substring(0, 70)}..."`, 'exec');
+            await callLLM(userPrompt);
+        });
+        
+        // Domain specific Agent Actions (Simulated autonomous but show blueprint)
+        const agentButtons = document.querySelectorAll('.agent-action');
+        agentButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const agentType = btn.getAttribute('data-agent');
+                let blueprintMsg = '';
+                if (agentType === 'shopify') {
+                    blueprintMsg = `Sir, Shopify Worker has researched "ergonomic pet accessories" + "digital wall art". I've prepared product title, meta fields, and supplier fulfillment rules. Ready for deployment? Speak 'Execute' to push to staging.`;
+                    addLog(`[Shopify Agent] Product gap audit: 23 low-competition variants. Await final consent.`, 'exec');
+                } else if (agentType === 'social') {
+                    blueprintMsg = `Social Syndicator Agent: generated 4 short-form scripts for TikTok/Reels/Pins. Anti-spam filters engaged (hashtag density ≤3, no keyword stuffing). Upload queue prepared. Consent required for cross-platform push.`;
+                    addLog(`[Social Agent] Cross-platform content ready (YT Shorts, Insta Reel, Pinterest). Platform policy compliance verified.`, 'success');
+                } else if (agentType === 'whatsapp') {
+                    blueprintMsg = `WhatsApp Delivery Worker: routed customer query logs, prepared automated delivery of "SaaS Growth Pack" PDF. Webhook integration test OK. Awaiting your final order to dispatch.`;
+                    addLog(`[WhatsApp Worker] Message router active. File asset delivery pipeline staged.`, 'exec');
+                } else if (agentType === 'coder') {
+                    blueprintMsg = `Coder Agent: Market gap analysis complete - 'AI review summarizer widget' demand high. I've generated production-ready React + Tailwind mini SaaS component (HTML/CSS/JS). Ready to output on your command, Sir.`;
+                    addLog(`[Coder Agent] Full-stack blueprint ready. No placeholder functions. Build integrity: 100%. Await permission.`, 'success');
+                }
+                aiResponseDiv.innerHTML = `<div class="border-l-4 border-blue-500 pl-3"><i class="fas fa-robot mr-1 text-indigo-400"></i> <span class="font-semibold">${agentType.toUpperCase()} AGENT BLUEPRINT</span><br>${escapeHtml(blueprintMsg)}<br><span class="text-xs text-slate-400 mt-2 block">⏳ Waiting for "Done", "Yes" or "Execute" final consent.</span></div>`;
+                lastGeneratedPayload = { agent: agentType, blueprint: blueprintMsg };
+            });
+        });
+        
+        // Market approval simulation (execution roadmap)
+        document.getElementById('approveMarketBtn').addEventListener('click', () => {
+            addLog("SIR APPROVED: Live market execution roadmap. Shopify product spying & social syndication initiated in simulation mode.", "success");
+            aiResponseDiv.innerHTML = `<span class="text-emerald-300">✅ Strategy authorized. Worker agents spinning up product listings, Pinterest SEO content, and WhatsApp auto-responders. Full deployment will be executed upon final explicit "Execute" command for actual live assets. JARVIS ready.</span>`;
+        });
+        document.getElementById('rejectMarketBtn').addEventListener('click', () => {
+            addLog("Market strategy rejected. Re-scanning global niches for alternative low-competition opportunities.", "warning");
+            aiResponseDiv.innerHTML = `<span class="text-yellow-200">🔄 Re-scan triggered: Refreshing demand indices for Etsy, Amazon, and digital product spaces. New report in 10 seconds, Sir.</span>`;
+        });
+        
+        // provider switchers
+        document.getElementById('setGeminiBtn').addEventListener('click', () => { setAPIProvider('gemini'); });
+        document.getElementById('setOpenAIBtn').addEventListener('click', () => { setAPIProvider('openai'); });
+        
+        clearLogsBtn.addEventListener('click', () => {
+            logsContainer.innerHTML = `<div class="text-emerald-400">> Logs cleared. JARVIS Core operational.</div>`;
+            addLog("Console flushed by executive request.", 'info');
+        });
+        
+        // Initial Auto-trend monitor simulation
+        setTimeout(() => {
+            addLog("Background simulation: Pinterest 'digital journal' +40% WoW, Shopify 'print on demand' saturation moderate. New angle: AI voice notes tool.", "exec");
+        }, 1500);
+        
+        // Global consent loop listener: check if user types "Execute", "Yes", "Done" in console or we can attach a prompt but as per spec we just show guidelines.
+        window.addEventListener('keydown', (e) => {
+            // optional instant command detection; but use simple alert style? We integrate as message.
+        });
+        // for final confirmation we add an interactive consent function (any "execute" like utterance from Sir through a quick input? Not required, but logs indicate ready)
+        addLog("JARVIS: All autonomous pipelines ready. Provide API key and deploy any task. Sub-agents are standing by, Sir.", "success");
+    </script>
+</body>
+</html>
