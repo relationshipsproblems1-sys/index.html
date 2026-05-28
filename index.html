@@ -3,26 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JARVIS - Bulletproof Voice Agent</title>
+    <title>JARVIS - Live Voice Assistant</title>
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #030712; color: #f3f4f6; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 90vh; }
         .agent-container { max-width: 700px; width: 100%; background: #0f172a; padding: 40px; border-radius: 24px; box-shadow: 0 0 35px rgba(56, 189, 248, 0.25); border: 2px solid #1e293b; text-align: center; }
         h1 { color: #38bdf8; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 3px; text-shadow: 0 0 15px rgba(56, 189, 248, 0.6); font-size: 28px; }
-        .status-bar { color: #10b981; font-size: 14px; margin-bottom: 40px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; }
-        .mic-container { margin-bottom: 30px; }
-        .main-btn { background: linear-gradient(135deg, #0284c7, #0369a1); color: white; font-weight: bold; padding: 20px 40px; font-size: 18px; border-radius: 50px; border: none; cursor: pointer; transition: 0.4s; text-transform: uppercase; letter-spacing: 2px; box-shadow: 0 4px 15px rgba(2, 132, 199, 0.4); width: 80%; }
-        .main-btn:hover { transform: scale(1.03); box-shadow: 0 0 25px rgba(56, 189, 248, 0.6); }
-        .mic-active { background: linear-gradient(135deg, #ef4444, #b91c1c) !important; box-shadow: 0 0 25px rgba(239, 68, 68, 0.6) !important; animation: pulse 1.5s infinite; }
-        .output-panel { background: #020617; padding: 25px; border-radius: 12px; margin-top: 30px; line-height: 1.6; font-size: 16px; color: #38bdf8; border: 1px solid #334155; font-family: 'Courier New', monospace; text-align: left; max-height: 200px; overflow-y: auto; }
+        .status-bar { color: #10b981; font-size: 14px; margin-bottom: 25px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; }
+        .mic-container { margin-bottom: 20px; }
+        .main-btn { background: linear-gradient(135deg, #0284c7, #0369a1); color: white; font-weight: bold; padding: 18px 35px; font-size: 16px; border-radius: 50px; border: none; cursor: pointer; transition: 0.4s; text-transform: uppercase; letter-spacing: 2px; width: 80%; }
+        .main-btn:hover { transform: scale(1.02); box-shadow: 0 0 25px rgba(56, 189, 248, 0.6); }
+        .mic-active { background: linear-gradient(135deg, #ef4444, #b91c1c) !important; box-shadow: 0 0 25px rgba(239, 68, 68, 0.6) !important; }
+        input { width: 80%; padding: 12px; background: #020617; border: 1px solid #334155; border-radius: 8px; color: #38bdf8; text-align: center; font-family: monospace; margin-bottom: 25px; font-size: 14px; }
+        .output-panel { background: #020617; padding: 25px; border-radius: 12px; margin-top: 20px; line-height: 1.6; font-size: 16px; color: #38bdf8; border: 1px solid #334155; font-family: 'Courier New', monospace; text-align: left; max-height: 200px; overflow-y: auto; width: 85%; margin-left: auto; margin-right: auto; }
         .hidden-fields { display: none; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.04); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
 
 <div class="agent-container">
     <h1>JARVIS CORE</h1>
-    <div class="status-bar" id="statusText">● HIGH-SPEED SERVER CONNECTED</div>
+    <div class="status-bar" id="statusText">● SYSTEM ARMED & READY</div>
+
+    <!-- Khufiya API Box Jo GitHub Block Nahi Karega -->
+    <input type="password" id="userApiKey" placeholder="Sir, paste your Google AI Studio Free API Key here...">
 
     <div class="mic-container">
         <button class="main-btn" id="actionBtn" onclick="toggleVoiceSystem()">🎙️ TALK TO JARVIS (BAAT KAREIN)</button>
@@ -32,13 +35,10 @@
         <textarea id="command"></textarea>
     </div>
 
-    <div class="output-panel" id="outputBox">JARVIS Status: Standing by for your voice command, Sir. Click the button above and speak.</div>
+    <div class="output-panel" id="outputBox">JARVIS: Awaiting your voice command, Sir. Please insert your key, click the button and speak.</div>
 </div>
 
 <script>
-    // ⚠️ YAHA APNI REAL GOOGLE GEMINI API KEY CODES KE ANDAR PASTE KAREIN
-    const SYSTEM_SECURE_KEY = "AQ.Ab8RN6LftQUayiLrLHtlsrVeWq8VhkBcJpYtmYhNj98HFxsLMA";
-
     let synth = window.speechSynthesis;
     let recognition;
     let isListening = false;
@@ -53,7 +53,7 @@
             isListening = true;
             document.getElementById('actionBtn').classList.add('mic-active');
             document.getElementById('actionBtn').innerText = "🛑 LISTENING TO SIR...";
-            document.getElementById('statusText').innerText = "● JARVIS IS LISTENING...";
+            document.getElementById('statusText').innerText = "● JARVIS IS PROCESSING AUDIO INPUT...";
             if (synth.speaking) { synth.cancel(); }
         };
 
@@ -65,7 +65,7 @@
         recognition.onend = function() {
             isListening = false;
             document.getElementById('actionBtn').classList.remove('mic-active');
-            document.getElementById('actionBtn').innerText = "⚡ THINKING...";
+            document.getElementById('actionBtn').innerText = "⚡ COGNITING RESPONSE...";
         };
 
         recognition.onresult = function(event) {
@@ -82,14 +82,12 @@
         if (isListening) { recognition.stop(); } else { recognition.start(); }
     }
 
-    // JARVIS Voice Output
     function jarvisSpeak(text) {
         if (synth.speaking) { synth.cancel(); }
         let cleanText = text.replace(/[#*`_]/g, '');
         let utterance = new SpeechSynthesisUtterance(cleanText);
         utterance.rate = 1.0; 
-        utterance.pitch = 0.85; // Deep JARVIS Tone
-        
+        utterance.pitch = 0.85; 
         utterance.onend = function() { resetUI(); };
         synth.speak(utterance);
     }
@@ -101,23 +99,24 @@
         document.getElementById('statusText').innerText = "● READY FOR VOICE COMMANDS, SIR";
     }
 
-    // High-Speed Gemini Native Integration
     async function executeGeminiCore(commandText) {
-        document.getElementById('statusText').innerText = "● JARVIS IS PROCESSING INTEGRATION COGNITION...";
+        const inputKey = document.getElementById('userApiKey').value.trim();
         const outputBox = document.getElementById('outputBox');
 
-        if(SYSTEM_SECURE_KEY === "YAHAN_APNI_GEMINI_KEY_PASTE_KAREIN" || !SYSTEM_SECURE_KEY) {
-            let msg = "Sir, please edit the code file and add your real Google Gemini API Key inside the SYSTEM_SECURE_KEY field.";
+        if(!inputKey) {
+            let msg = "Sir, please paste your free Gemini API Key in the password field first.";
             outputBox.innerText = msg;
             jarvisSpeak(msg);
             resetUI();
             return;
         }
 
+        document.getElementById('statusText').innerText = "● RECOGNIZING SCALING BLUEPRINTS...";
+
         const masterAgentPrompt = `You are JARVIS, my supreme Autonomous AI Personal Business Partner. Always address the user as 'Sir'. Always start your response with 'Yes Sir'. Keep your response precise, highly professional, direct, and under 3-4 sentences so it sounds like a real short spoken answer. Do not use markdown symbols like stars. Process this instruction: ${commandText}`;
 
         try {
-            const url = `https://googleapis.com{SYSTEM_SECURE_KEY}`;
+            const url = `https://googleapis.com{inputKey}`;
             const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -126,13 +125,13 @@
 
             const data = await response.json();
             
-            if (data && data.candidates && data.candidates[0].content.parts[0].text) {
-                const cleanResult = data.candidates[0].content.parts[0].text.trim();
+            if (data && data.candidates && data.candidates.content.parts.text) {
+                const cleanResult = data.candidates.content.parts.text.trim();
                 outputBox.innerText = cleanResult;
                 jarvisSpeak(cleanResult);
             } else if (data.error) {
                 outputBox.innerText = "API Error, Sir: " + data.error.message;
-                jarvisSpeak("API Security error, Sir.");
+                jarvisSpeak("API Security error, Sir. Check the key.");
                 resetUI();
             }
         } catch (error) {
