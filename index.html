@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JARVIS - Insaani Aawaz Agent</title>
+    <title>JARVIS - Bulletproof Voice Agent</title>
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #030712; color: #f3f4f6; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 90vh; }
         .agent-container { max-width: 700px; width: 100%; background: #0f172a; padding: 40px; border-radius: 24px; box-shadow: 0 0 35px rgba(56, 189, 248, 0.25); border: 2px solid #1e293b; text-align: center; }
@@ -22,7 +22,7 @@
 
 <div class="agent-container">
     <h1>JARVIS CORE</h1>
-    <div class="status-bar" id="statusText">● READY FOR VOICE COMMANDS, SIR</div>
+    <div class="status-bar" id="statusText">● HIGH-SPEED SERVER CONNECTED</div>
 
     <div class="mic-container">
         <button class="main-btn" id="actionBtn" onclick="toggleVoiceSystem()">🎙️ TALK TO JARVIS (BAAT KAREIN)</button>
@@ -32,15 +32,17 @@
         <textarea id="command"></textarea>
     </div>
 
-    <div class="output-panel" id="outputBox">JARVIS Statement: Standing by for your voice command, Sir. Click the button above and speak.</div>
+    <div class="output-panel" id="outputBox">JARVIS Status: Standing by for your voice command, Sir. Click the button above and speak.</div>
 </div>
 
 <script>
+    // ⚠️ YAHA APNI REAL GOOGLE GEMINI API KEY CODES KE ANDAR PASTE KAREIN
+    const SYSTEM_SECURE_KEY = "YAHAN_APNI_GEMINI_KEY_PASTE_KAREIN";
+
     let synth = window.speechSynthesis;
     let recognition;
     let isListening = false;
 
-    // Voice Recognition Setup
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
         recognition.lang = 'en-US';
@@ -51,37 +53,45 @@
             isListening = true;
             document.getElementById('actionBtn').classList.add('mic-active');
             document.getElementById('actionBtn').innerText = "🛑 LISTENING TO SIR...";
-            document.getElementById('statusText').innerText = "● JARVIS IS IS LISTENING TO YOUR VOICE...";
+            document.getElementById('statusText').innerText = "● JARVIS IS LISTENING...";
             if (synth.speaking) { synth.cancel(); }
         };
 
-        recognition.onerror = function(event) {
+        recognition.onerror = function() {
             resetUI();
-            document.getElementById('outputBox').innerText = "System Mic Error, Sir. Please try again.";
+            document.getElementById('outputBox').innerText = "System Mic Error, Sir. Try again.";
         };
 
         recognition.onend = function() {
             isListening = false;
             document.getElementById('actionBtn').classList.remove('mic-active');
-            document.getElementById('actionBtn').innerText = "⚡ PROCESSING VALUE...";
+            document.getElementById('actionBtn').innerText = "⚡ THINKING...";
         };
 
         recognition.onresult = function(event) {
-            const voiceText = event.results[0][0].transcript;
+            const voiceText = event.results.transcript;
             document.getElementById('command').value = voiceText;
             document.getElementById('outputBox').innerText = "Sir Said: \"" + voiceText + "\"";
-            executeAgentPayload(voiceText);
+            executeGeminiCore(voiceText);
         };
     } else {
-        alert("Sir, your browser does not support Voice Recognition. Please use Google Chrome.");
+        alert("Sir, please use Google Chrome browser for voice systems.");
     }
 
     function toggleVoiceSystem() {
-        if (isListening) {
-            recognition.stop();
-        } else {
-            recognition.start();
-        }
+        if (isListening) { recognition.stop(); } else { recognition.start(); }
+    }
+
+    // JARVIS Voice Output
+    function jarvisSpeak(text) {
+        if (synth.speaking) { synth.cancel(); }
+        let cleanText = text.replace(/[#*`_]/g, '');
+        let utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.rate = 1.0; 
+        utterance.pitch = 0.85; // Deep JARVIS Tone
+        
+        utterance.onend = function() { resetUI(); };
+        synth.speak(utterance);
     }
 
     function resetUI() {
@@ -91,52 +101,42 @@
         document.getElementById('statusText').innerText = "● READY FOR VOICE COMMANDS, SIR";
     }
 
-    // JARVIS Speak Action
-    function jarvisSpeak(text) {
-        if (synth.speaking) { synth.cancel(); }
-        let cleanText = text.replace(/[#*`_]/g, '');
-        let utterance = new SpeechSynthesisUtterance(cleanText);
-        utterance.rate = 1.0; 
-        utterance.pitch = 0.85; // Deep Male Corporate Assistant Voice
-        
-        utterance.onend = function() {
-            resetUI();
-        };
-        
-        synth.speak(utterance);
-    }
-
-    // Processing Agent Engine
-    async function executeAgentPayload(commandText) {
-        document.getElementById('statusText').innerText = "● JARVIS IS THINKING AND COGNITING...";
+    // High-Speed Gemini Native Integration
+    async function executeGeminiCore(commandText) {
+        document.getElementById('statusText').innerText = "● JARVIS IS PROCESSING INTEGRATION COGNITION...";
         const outputBox = document.getElementById('outputBox');
 
+        if(SYSTEM_SECURE_KEY === "YAHAN_APNI_GEMINI_KEY_PASTE_KAREIN" || !SYSTEM_SECURE_KEY) {
+            let msg = "Sir, please edit the code file and add your real Google Gemini API Key inside the SYSTEM_SECURE_KEY field.";
+            outputBox.innerText = msg;
+            jarvisSpeak(msg);
+            resetUI();
+            return;
+        }
+
+        const masterAgentPrompt = `You are JARVIS, my supreme Autonomous AI Personal Business Partner. Always address the user as 'Sir'. Always start your response with 'Yes Sir'. Keep your response precise, highly professional, direct, and under 3-4 sentences so it sounds like a real short spoken answer. Do not use markdown symbols like stars. Process this instruction: ${commandText}`;
+
         try {
-            const response = await fetch("https://huggingface.co", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                    inputs: `<|system|>\nYou are JARVIS, a supreme AI Personal Business Partner. Always address the user as 'Sir'. Always start your response with 'Yes Sir'. Keep your response precise, highly professional, direct, and under 3-4 sentences so it sounds like a real short spoken answer.\n<|user|>\n${commandText}\n<|assistant|>\n`
-                })
+            const url = `https://googleapis.com{SYSTEM_SECURE_KEY}`;
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: masterAgentPrompt }] }] })
             });
 
             const data = await response.json();
             
-            if (data && data.generated_text) {
-                const fullText = data.generated_text;
-                const parts = fullText.split("<|assistant|>");
-                const cleanResult = parts[parts.length - 1].trim();
-                
+            if (data && data.candidates && data.candidates[0].content.parts[0].text) {
+                const cleanResult = data.candidates[0].content.parts[0].text.trim();
                 outputBox.innerText = cleanResult;
                 jarvisSpeak(cleanResult);
             } else if (data.error) {
-                let errStr = "Server node is waking up, Sir. Please trigger me again in 5 seconds.";
-                outputBox.innerText = errStr;
-                jarvisSpeak(errStr);
+                outputBox.innerText = "API Error, Sir: " + data.error.message;
+                jarvisSpeak("API Security error, Sir.");
                 resetUI();
             }
         } catch (error) {
-            outputBox.innerText = "Connection break, Sir. Try again.";
+            outputBox.innerText = "Network pipeline issue, Sir. Re-trying...";
             resetUI();
         }
     }
